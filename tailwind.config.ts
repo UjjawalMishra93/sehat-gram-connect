@@ -19,6 +19,8 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        
+        /* Sehat-Gram Healthcare Color System */
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -27,6 +29,27 @@ export default {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
         },
+        
+        /* Healthcare status colors */
+        "high-urgency": {
+          DEFAULT: "hsl(var(--high-urgency))",
+          bg: "hsl(var(--high-urgency-bg))",
+        },
+        "medium-urgency": {
+          DEFAULT: "hsl(var(--medium-urgency))",
+          bg: "hsl(var(--medium-urgency-bg))",
+        },
+        "low-urgency": {
+          DEFAULT: "hsl(var(--low-urgency))",
+          bg: "hsl(var(--low-urgency-bg))",
+        },
+        
+        /* Background variants */
+        "main-background": "hsl(var(--main-background))",
+        "card-background": "hsl(var(--card-background))",
+        "network-toggle": "hsl(var(--network-toggle))",
+        "neutral-text": "hsl(var(--neutral-text))",
+        
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
@@ -57,6 +80,10 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
+      fontFamily: {
+        sans: ["system-ui", "sans-serif"],
+        extrabold: ["system-ui", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
