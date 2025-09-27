@@ -1,223 +1,71 @@
-import { useState, useEffect } from 'react';
-import { toast } from '@/hooks/use-toast';
-import RoleSelector from '@/components/RoleSelector';
-import Header from '@/components/Header';
-import AshaWorkerDashboard from '@/components/AshaWorkerDashboard';
-import DoctorDashboard from '@/components/DoctorDashboard';
-import PharmacyDashboard from '@/components/PharmacyDashboard';
-import { UserRole, Language, Patient, Medicine, AppState } from '@/types';
-
-// Mock initial data
-const initialMedicines: Medicine[] = [
-  {
-    id: '1',
-    name: 'Paracetamol',
-    nameHi: 'पेरासिटामोल',
-    stock: 45,
-    critical: true,
-    lastUpdated: new Date().toISOString()
-  },
-  {
-    id: '2',
-    name: 'Amoxicillin',
-    nameHi: 'एमोक्सिसिलिन',
-    stock: 8,
-    critical: true,
-    lastUpdated: new Date().toISOString()
-  },
-  {
-    id: '3',
-    name: 'ORS Sachets',
-    nameHi: 'ओआरएस पाउडर',
-    stock: 120,
-    critical: true,
-    lastUpdated: new Date().toISOString()
-  },
-  {
-    id: '4',
-    name: 'Iron Tablets',
-    nameHi: 'आयरन की गोलियां',
-    stock: 25,
-    critical: false,
-    lastUpdated: new Date().toISOString()
-  }
-];
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import AshaWorkerDashboardAuth from '@/components/AshaWorkerDashboardAuth';
+import DoctorDashboardAuth from '@/components/DoctorDashboardAuth';
+import PharmacyDashboardAuth from '@/components/PharmacyDashboardAuth';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Language } from '@/types';
+import { useState } from 'react';
 
 const Index = () => {
-  const [appState, setAppState] = useState<AppState>({
-    currentUser: {
-      role: 'asha',
-      name: '',
-      id: 'user-1'
-    },
-    language: 'en',
-    networkStatus: {
-      online: true,
-      lastSync: new Date().toISOString()
-    },
-    patients: [],
-    medicines: initialMedicines,
-    pendingSync: []
-  });
+  const { user, profile, loading, signOut } = useAuth();
+  const navigate = useNavigate();
+  const [language, setLanguage] = useState<Language>('en');
 
-  const [showRoleSelector, setShowRoleSelector] = useState(true);
-
-  // Simulated offline sync functionality
   useEffect(() => {
-    const syncData = () => {
-      if (appState.networkStatus.online && appState.pendingSync.length > 0) {
-        setAppState(prev => ({
-          ...prev,
-          patients: prev.patients.map(p => ({ ...p, synced: true })),
-          pendingSync: [],
-          networkStatus: {
-            ...prev.networkStatus,
-            lastSync: new Date().toISOString()
-          }
-        }));
-        toast({
-          title: "Sync Complete",
-          description: `${appState.pendingSync.length} records synced successfully`
-        });
-      }
-    };
-
-    if (appState.networkStatus.online) {
-      const timer = setTimeout(syncData, 2000);
-      return () => clearTimeout(timer);
+    if (!loading && !user) {
+      navigate('/auth');
     }
-  }, [appState.networkStatus.online, appState.pendingSync.length]);
-
-  const handleRoleSelect = (role: UserRole) => {
-    const names = {
-      asha: 'ASHA Worker',
-      doctor: 'Dr. Sharma',
-      pharmacy: 'Pharmacy Staff',
-      patient: 'Patient'
-    };
-
-    setAppState(prev => ({
-      ...prev,
-      currentUser: {
-        ...prev.currentUser,
-        role,
-        name: names[role]
-      }
-    }));
-    setShowRoleSelector(false);
-  };
+  }, [user, loading, navigate]);
 
   const handleLanguageToggle = () => {
-    setAppState(prev => ({
-      ...prev,
-      language: prev.language === 'en' ? 'hi' : 'en'
-    }));
+    setLanguage(prev => prev === 'en' ? 'hi' : 'en');
   };
 
-  const handleNetworkToggle = () => {
-    setAppState(prev => ({
-      ...prev,
-      networkStatus: {
-        ...prev.networkStatus,
-        online: !prev.networkStatus.online
-      }
-    }));
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-main-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-lg text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const handleSync = () => {
-    if (!appState.networkStatus.online) {
-      setAppState(prev => ({
-        ...prev,
-        networkStatus: {
-          ...prev.networkStatus,
-          online: true
-        }
-      }));
-    }
-  };
-
-  const handleAddPatient = (newPatient: Omit<Patient, 'id' | 'timestamp' | 'synced'>) => {
-    const patient: Patient = {
-      ...newPatient,
-      id: `patient-${Date.now()}`,
-      timestamp: new Date().toISOString(),
-      synced: appState.networkStatus.online
-    };
-
-    setAppState(prev => ({
-      ...prev,
-      patients: [...prev.patients, patient],
-      pendingSync: prev.networkStatus.online 
-        ? prev.pendingSync 
-        : [...prev.pendingSync, patient]
-    }));
-
-    toast({
-      title: appState.language === 'en' ? "Patient Added" : "मरीज़ जोड़ा गया",
-      description: appState.networkStatus.online 
-        ? (appState.language === 'en' ? "Patient data saved successfully" : "मरीज़ का डेटा सफलतापूर्वक सेव हुआ")
-        : (appState.language === 'en' ? "Patient saved locally. Will sync when online." : "मरीज़ स्थानीय रूप से सेव हुआ। ऑनलाइन होने पर सिंक होगा।")
-    });
-  };
-
-  const handleUpdateStock = (medicineId: string, newStock: number) => {
-    setAppState(prev => ({
-      ...prev,
-      medicines: prev.medicines.map(m => 
-        m.id === medicineId 
-          ? { ...m, stock: newStock, lastUpdated: new Date().toISOString() }
-          : m
-      )
-    }));
-
-    toast({
-      title: appState.language === 'en' ? "Stock Updated" : "स्टॉक अपडेट हुआ",
-      description: appState.language === 'en' 
-        ? "Medicine stock updated successfully" 
-        : "दवा का स्टॉक सफलतापूर्वक अपडेट हुआ"
-    });
-  };
-
-  if (showRoleSelector) {
-    return <RoleSelector onRoleSelect={handleRoleSelect} language={appState.language} />;
+  if (!user || !profile) {
+    return (
+      <div className="min-h-screen bg-main-background flex items-center justify-center">
+        <Card className="p-6 text-center">
+          <h2 className="text-2xl font-bold mb-4">Authentication Required</h2>
+          <p className="mb-4">Please sign in to access Sehat-Gram</p>
+          <Button onClick={() => navigate('/auth')}>
+            Go to Sign In
+          </Button>
+        </Card>
+      </div>
+    );
   }
 
   const renderDashboard = () => {
-    switch (appState.currentUser.role) {
+    switch (profile.role) {
       case 'asha':
-        return (
-          <AshaWorkerDashboard
-            language={appState.language}
-            patients={appState.patients}
-            medicines={appState.medicines}
-            networkOnline={appState.networkStatus.online}
-            onAddPatient={handleAddPatient}
-          />
-        );
+        return <AshaWorkerDashboardAuth language={language} />;
       case 'doctor':
-        return (
-          <DoctorDashboard
-            language={appState.language}
-            patients={appState.patients.filter(p => p.synced)}
-          />
-        );
+        return <DoctorDashboardAuth language={language} />;
       case 'pharmacy':
-        return (
-          <PharmacyDashboard
-            language={appState.language}
-            medicines={appState.medicines}
-            onUpdateStock={handleUpdateStock}
-          />
-        );
+        return <PharmacyDashboardAuth language={language} />;
       default:
         return (
           <div className="p-6 bg-main-background min-h-screen">
             <div className="text-center">
               <h2 className="text-2xl font-extrabold text-neutral-text mb-4">
-                {appState.language === 'en' ? 'Patient Dashboard Coming Soon' : 'मरीज़ डैशबोर्ड जल्द आ रहा है'}
+                {language === 'en' ? 'Patient Dashboard Coming Soon' : 'मरीज़ डैशबोर्ड जल्द आ रहा है'}
               </h2>
               <p className="text-xl text-muted-foreground">
-                {appState.language === 'en' 
+                {language === 'en' 
                   ? 'Patient features will be available in the next version'
                   : 'मरीज़ की सुविधाएं अगले संस्करण में उपलब्ध होंगी'
                 }
@@ -230,15 +78,42 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-main-background">
-      <Header
-        userRole={appState.currentUser.role}
-        userName={appState.currentUser.name}
-        language={appState.language}
-        networkStatus={appState.networkStatus}
-        onLanguageToggle={handleLanguageToggle}
-        onNetworkToggle={handleNetworkToggle}
-        onSync={handleSync}
-      />
+      <header className="bg-card border-b shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-4">
+              <h1 className="text-2xl font-extrabold text-primary">Sehat-Gram</h1>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  {profile.display_name || user.email}
+                </span>
+                <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                  {profile.role.toUpperCase()}
+                </span>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLanguageToggle}
+              >
+                {language === 'en' ? 'हिंदी' : 'English'}
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={signOut}
+              >
+                Sign Out
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+      
       {renderDashboard()}
     </div>
   );

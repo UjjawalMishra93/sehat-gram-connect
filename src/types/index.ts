@@ -9,19 +9,28 @@ export interface Patient {
   gender: 'male' | 'female' | 'other';
   village: string;
   symptoms: string[];
-  urgencyScore: 1 | 2 | 3;
-  timestamp: string;
+  urgency_score: 1 | 2 | 3;
+  created_at: string;
   synced: boolean;
-  ashaWorker: string;
+  asha_worker_id: string;
+}
+
+export interface Profile {
+  id: string;
+  user_id: string;
+  display_name: string | null;
+  role: UserRole;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Medicine {
   id: string;
   name: string;
-  nameHi: string;
+  name_hi: string;
   stock: number;
   critical: boolean;
-  lastUpdated: string;
+  last_updated: string;
 }
 
 export interface NetworkStatus {

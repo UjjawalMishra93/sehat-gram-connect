@@ -14,7 +14,107 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      medicines: {
+        Row: {
+          critical: boolean
+          id: string
+          last_updated: string
+          name: string
+          name_hi: string
+          stock: number
+        }
+        Insert: {
+          critical?: boolean
+          id?: string
+          last_updated?: string
+          name: string
+          name_hi: string
+          stock?: number
+        }
+        Update: {
+          critical?: boolean
+          id?: string
+          last_updated?: string
+          name?: string
+          name_hi?: string
+          stock?: number
+        }
+        Relationships: []
+      }
+      patients: {
+        Row: {
+          age: number
+          asha_worker_id: string
+          created_at: string
+          gender: string
+          id: string
+          name: string
+          symptoms: string[]
+          synced: boolean
+          urgency_score: number
+          village: string
+        }
+        Insert: {
+          age: number
+          asha_worker_id: string
+          created_at?: string
+          gender: string
+          id?: string
+          name: string
+          symptoms?: string[]
+          synced?: boolean
+          urgency_score: number
+          village: string
+        }
+        Update: {
+          age?: number
+          asha_worker_id?: string
+          created_at?: string
+          gender?: string
+          id?: string
+          name?: string
+          symptoms?: string[]
+          synced?: boolean
+          urgency_score?: number
+          village?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patients_asha_worker_id_fkey"
+            columns: ["asha_worker_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          role: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          role?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          role?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
