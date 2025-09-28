@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import AshaWorkerDashboardAuth from '@/components/AshaWorkerDashboardAuth';
 import DoctorDashboardAuth from '@/components/DoctorDashboardAuth';
 import PharmacyDashboardAuth from '@/components/PharmacyDashboardAuth';
+import PatientDashboardAuth from '@/components/PatientDashboardAuth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Language } from '@/types';
@@ -57,20 +58,20 @@ const Index = () => {
         return <DoctorDashboardAuth language={language} />;
       case 'pharmacy':
         return <PharmacyDashboardAuth language={language} />;
+      case 'patient':
+        return <PatientDashboardAuth language={language} />;
       default:
         return (
-          <div className="p-6 bg-main-background min-h-screen">
-            <div className="text-center">
-              <h2 className="text-2xl font-extrabold text-neutral-text mb-4">
-                {language === 'en' ? 'Patient Dashboard Coming Soon' : 'मरीज़ डैशबोर्ड जल्द आ रहा है'}
-              </h2>
-              <p className="text-xl text-muted-foreground">
-                {language === 'en' 
-                  ? 'Patient features will be available in the next version'
-                  : 'मरीज़ की सुविधाएं अगले संस्करण में उपलब्ध होंगी'
-                }
-              </p>
-            </div>
+          <div className="text-center">
+            <h2 className="text-2xl font-extrabold text-neutral-text mb-4">
+              {language === 'en' ? 'Dashboard Not Available' : 'डैशबोर्ड उपलब्ध नहीं है'}
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              {language === 'en' 
+                ? 'No dashboard is available for your user role.'
+                : 'आपकी उपयोगकर्ता भूमिका के लिए कोई डैशबोर्ड उपलब्ध नहीं है।'
+              }
+            </p>
           </div>
         );
     }
@@ -114,7 +115,9 @@ const Index = () => {
         </div>
       </header>
       
-      {renderDashboard()}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {renderDashboard()}
+      </main>
     </div>
   );
 };

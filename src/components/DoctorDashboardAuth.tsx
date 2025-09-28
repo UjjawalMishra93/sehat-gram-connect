@@ -42,7 +42,7 @@ export default function DoctorDashboardAuth({ language }: DoctorDashboardAuthPro
 
   if (loading) {
     return (
-      <div className="p-6 bg-main-background min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center py-6">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-lg text-muted-foreground">Loading patients...</p>
@@ -56,7 +56,7 @@ export default function DoctorDashboardAuth({ language }: DoctorDashboardAuthPro
   const lowPriorityPatients = patients.filter(p => p.urgency_score === 1);
 
   return (
-    <div className="p-6 bg-main-background min-h-screen space-y-6">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-extrabold text-neutral-text">
           {t('doctor', language)} Dashboard
@@ -76,12 +76,12 @@ export default function DoctorDashboardAuth({ language }: DoctorDashboardAuthPro
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="p-6">
+        <Card className="p-6 flex flex-col">
           <h3 className="text-xl font-extrabold text-red-600 mb-4 flex items-center gap-2">
             🚨 {language === 'en' ? 'Urgent Cases' : 'अत्यावश्यक मामले'}
           </h3>
           
-          <div className="space-y-3">
+          <div className="space-y-3 overflow-y-auto h-[400px] pr-2 thin-scrollbar">
             {urgentPatients.map((patient) => (
               <div key={patient.id} className="p-4 bg-red-50 border border-red-200 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
@@ -112,12 +112,12 @@ export default function DoctorDashboardAuth({ language }: DoctorDashboardAuthPro
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-6 flex flex-col">
           <h3 className="text-xl font-extrabold text-orange-600 mb-4 flex items-center gap-2">
             ⚠️ {language === 'en' ? 'Moderate Cases' : 'मध्यम मामले'}
           </h3>
           
-          <div className="space-y-3">
+          <div className="space-y-3 overflow-y-auto h-[400px] pr-2 thin-scrollbar">
             {moderatePatients.map((patient) => (
               <div key={patient.id} className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
@@ -148,12 +148,12 @@ export default function DoctorDashboardAuth({ language }: DoctorDashboardAuthPro
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-6 flex flex-col">
           <h3 className="text-xl font-extrabold text-green-600 mb-4 flex items-center gap-2">
             ℹ️ {language === 'en' ? 'Low Priority' : 'कम प्राथमिकता'}
           </h3>
           
-          <div className="space-y-3">
+          <div className="space-y-3 overflow-y-auto h-[400px] pr-2 thin-scrollbar">
             {lowPriorityPatients.map((patient) => (
               <div key={patient.id} className="p-4 bg-green-50 border border-green-200 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
@@ -221,6 +221,6 @@ export default function DoctorDashboardAuth({ language }: DoctorDashboardAuthPro
           </div>
         </div>
       </Card>
-    </div>
+    </main>
   );
 }

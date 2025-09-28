@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { t } from '@/utils/translations';
-import { calculateTriageScore } from '@/utils/triage';
 import { Patient, Medicine, Language } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -28,7 +27,8 @@ export default function AshaWorkerDashboardAuth({ language }: AshaWorkerDashboar
     age: '',
     gender: 'male' as 'male' | 'female' | 'other',
     village: '',
-    symptoms: [] as string[]
+    symptoms: [] as string[],
+    priority: 2,
   });
 
   useEffect(() => {
@@ -53,8 +53,6 @@ export default function AshaWorkerDashboardAuth({ language }: AshaWorkerDashboar
 
   const handleAddPatient = async () => {
     if (!newPatient.name || !newPatient.age || !newPatient.village || !profile) return;
-
-    const urgencyScore = calculateTriageScore(newPatient.symptoms);
     
     const patientData = {
       name: newPatient.name,
@@ -62,7 +60,7 @@ export default function AshaWorkerDashboardAuth({ language }: AshaWorkerDashboar
       gender: newPatient.gender,
       village: newPatient.village,
       symptoms: newPatient.symptoms,
-      urgency_score: urgencyScore,
+      urgency_score: newPatient.priority,
       asha_worker_id: profile.user_id,
       synced: !offline
     };
@@ -105,7 +103,7 @@ export default function AshaWorkerDashboardAuth({ language }: AshaWorkerDashboar
       }
     }
 
-    setNewPatient({ name: '', age: '', gender: 'male', village: '', symptoms: [] });
+    setNewPatient({ name: '', age: '', gender: 'male', village: '', symptoms: [], priority: 2 });
   };
 
   const handleSync = async () => {
@@ -167,7 +165,7 @@ export default function AshaWorkerDashboardAuth({ language }: AshaWorkerDashboar
 
   if (loading) {
     return (
-      <div className="p-6 bg-main-background min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center py-6">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-lg text-muted-foreground">Loading...</p>
@@ -176,8 +174,14 @@ export default function AshaWorkerDashboardAuth({ language }: AshaWorkerDashboar
     );
   }
 
+  const priorityOptions = [
+    { value: 3, label: 'High', color: 'bg-red-500' },
+    { value: 2, label: 'Medium', color: 'bg-yellow-500' },
+    { value: 1, label: 'Low', color: 'bg-green-500' },
+  ];
+
   return (
-    <div className="p-6 bg-main-background min-h-screen space-y-6">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-extrabold text-neutral-text">
           {t('ashaWorker', language)} Dashboard
@@ -263,6 +267,27 @@ export default function AshaWorkerDashboardAuth({ language }: AshaWorkerDashboar
                 ))}
               </div>
             </div>
+
+            <div>
+              <p className="text-sm font-medium text-neutral-text mb-2">
+                {language === 'en' ? 'Priority' : 'प्राथमिकता'}
+              </p>
+              <div className="flex space-x-2">
+                {priorityOptions.map(option => (
+                  <button
+                    key={option.value}
+                    onClick={() => setNewPatient(prev => ({ ...prev, priority: option.value }))}
+                    className={`w-full p-2 text-sm rounded-md border transition-colors ${
+                      newPatient.priority === option.value
+                        ? `${option.color} text-white`
+                        : 'bg-card text-card-foreground hover:bg-muted'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             
             <Button onClick={handleAddPatient} className="w-full">
               {language === 'en' ? 'Add Patient' : 'मरीज़ जोड़ें'}
@@ -270,12 +295,12 @@ export default function AshaWorkerDashboardAuth({ language }: AshaWorkerDashboar
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-6 flex flex-col">
           <h3 className="text-xl font-extrabold text-neutral-text mb-4">
             {language === 'en' ? 'Medicine Stock' : 'दवा स्टॉक'}
           </h3>
           
-          <div className="space-y-3">
+          <div className="space-y-3 overflow-y-auto h-[400px] pr-2">
             {medicines.map((medicine) => (
               <div key={medicine.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                 <div>
@@ -290,17 +315,17 @@ export default function AshaWorkerDashboardAuth({ language }: AshaWorkerDashboar
                   <Badge variant="destructive">Low Stock</Badge>
                 )}
               </div>
-            ))}
+            ))}\
           </div>
         </Card>
       </div>
 
-      <Card className="p-6">
+      <Card className="p-6 flex flex-col">
         <h3 className="text-xl font-extrabold text-neutral-text mb-4">
           {language === 'en' ? 'Recent Patients' : 'हाल के मरीज़'}
         </h3>
         
-        <div className="space-y-3">
+        <div className="space-y-3 overflow-y-auto h-[400px] pr-2">
           {[...pendingSync, ...patients].slice(0, 10).map((patient, idx) => (
             <div key={patient.id || idx} className="flex items-center justify-between p-4 bg-muted rounded-lg">
               <div>
@@ -321,12 +346,12 @@ export default function AshaWorkerDashboardAuth({ language }: AshaWorkerDashboar
                 </Badge>
                 {!patient.synced && (
                   <Badge variant="outline">Pending</Badge>
-                )}
+                )}\
               </div>
             </div>
-          ))}
+          ))}\
         </div>
       </Card>
-    </div>
+    </main>
   );
 }

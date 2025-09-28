@@ -21,7 +21,6 @@ export default function PharmacyDashboardAuth({ language }: PharmacyDashboardAut
   useEffect(() => {
     loadMedicines();
     
-    // Set up real-time subscription
     const channel = supabase
       .channel('medicines-changes')
       .on(
@@ -107,7 +106,7 @@ export default function PharmacyDashboardAuth({ language }: PharmacyDashboardAut
 
   if (loading) {
     return (
-      <div className="p-6 bg-main-background min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center py-6">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-lg text-muted-foreground">Loading medicines...</p>
@@ -117,7 +116,7 @@ export default function PharmacyDashboardAuth({ language }: PharmacyDashboardAut
   }
 
   return (
-    <div className="p-6 bg-main-background min-h-screen space-y-6">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-extrabold text-neutral-text">
           {t('pharmacy', language)} Dashboard
@@ -286,6 +285,6 @@ export default function PharmacyDashboardAuth({ language }: PharmacyDashboardAut
           </div>
         </div>
       </Card>
-    </div>
+    </main>
   );
 }

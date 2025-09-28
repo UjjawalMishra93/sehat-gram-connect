@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +24,7 @@ export default function Auth() {
     role: 'asha' as 'asha' | 'doctor' | 'pharmacy' | 'patient'
   });
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +49,7 @@ export default function Auth() {
           title: "Welcome back!",
           description: "You have been logged in successfully."
         });
+        navigate('/');
       } else {
         const redirectUrl = `${window.location.origin}/`;
         
